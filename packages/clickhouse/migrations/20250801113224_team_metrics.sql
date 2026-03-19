@@ -1,7 +1,7 @@
 -- +goose Up
 
 -- Create target table
-CREATE TABLE team_metrics_gauge_local (
+CREATE TABLE IF NOT EXISTS team_metrics_gauge_local ON CLUSTER 'cluster' (
    timestamp     DateTime64(9) CODEC (ZSTD(1)),
    team_id       String        CODEC (ZSTD(1)),
    metric_name   LowCardinality(String) CODEC (ZSTD(1)),
@@ -12,7 +12,7 @@ ORDER BY (team_id, metric_name, toUnixTimestamp64Nano(timestamp))
 TTL toDateTime(timestamp) + INTERVAL 30 DAY;
 
 -- Create routing table that routes sandbox metrics
-CREATE TABLE team_metrics_gauge AS team_metrics_gauge_local
+CREATE TABLE IF NOT EXISTS team_metrics_gauge ON CLUSTER 'cluster' AS team_metrics_gauge_local
     ENGINE = Distributed('cluster', currentDatabase(), 'team_metrics_gauge_local', xxHash64(team_id));
 
 -- Create materialized view that routes sandbox metrics
@@ -27,6 +27,6 @@ WHERE MetricName LIKE 'e2b.team.%';
 
 
 -- +goose Down
-DROP TABLE IF EXISTS team_metrics_gauge_mv;
-DROP TABLE IF EXISTS team_metrics_gauge;
-DROP TABLE IF EXISTS team_metrics_gauge_local;
+DROP TABLE IF EXISTS team_metrics_gauge_mv ON CLUSTER 'cluster';
+DROP TABLE IF EXISTS team_metrics_gauge ON CLUSTER 'cluster';
+DROP TABLE IF EXISTS team_metrics_gauge_local ON CLUSTER 'cluster';

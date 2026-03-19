@@ -1,6 +1,6 @@
 -- +goose Up
 -- +goose StatementBegin
-ALTER TABLE sandbox_host_stats_local
+ALTER TABLE sandbox_host_stats_local ON CLUSTER 'cluster'
 	ADD COLUMN IF NOT EXISTS cgroup_cpu_usage_usec UInt64 DEFAULT 0 CODEC (ZSTD(1)),
 	ADD COLUMN IF NOT EXISTS cgroup_cpu_user_usec UInt64 DEFAULT 0 CODEC (ZSTD(1)),
 	ADD COLUMN IF NOT EXISTS cgroup_cpu_system_usec UInt64 DEFAULT 0 CODEC (ZSTD(1)),
@@ -9,7 +9,7 @@ ALTER TABLE sandbox_host_stats_local
 -- +goose StatementEnd
 
 -- +goose StatementBegin
-ALTER TABLE sandbox_host_stats
+ALTER TABLE sandbox_host_stats ON CLUSTER 'cluster'
 	ADD COLUMN IF NOT EXISTS cgroup_cpu_usage_usec UInt64 DEFAULT 0 CODEC (ZSTD(1)),
 	ADD COLUMN IF NOT EXISTS cgroup_cpu_user_usec UInt64 DEFAULT 0 CODEC (ZSTD(1)),
 	ADD COLUMN IF NOT EXISTS cgroup_cpu_system_usec UInt64 DEFAULT 0 CODEC (ZSTD(1)),
@@ -19,7 +19,7 @@ ALTER TABLE sandbox_host_stats
 
 -- +goose Down
 -- +goose StatementBegin
-ALTER TABLE sandbox_host_stats
+ALTER TABLE sandbox_host_stats ON CLUSTER 'cluster'
 	DROP COLUMN IF EXISTS cgroup_cpu_usage_usec,
 	DROP COLUMN IF EXISTS cgroup_cpu_user_usec,
 	DROP COLUMN IF EXISTS cgroup_cpu_system_usec,
@@ -28,7 +28,7 @@ ALTER TABLE sandbox_host_stats
 -- +goose StatementEnd
 
 -- +goose StatementBegin
-ALTER TABLE sandbox_host_stats_local
+ALTER TABLE sandbox_host_stats_local ON CLUSTER 'cluster'
 	DROP COLUMN IF EXISTS cgroup_cpu_usage_usec,
 	DROP COLUMN IF EXISTS cgroup_cpu_user_usec,
 	DROP COLUMN IF EXISTS cgroup_cpu_system_usec,

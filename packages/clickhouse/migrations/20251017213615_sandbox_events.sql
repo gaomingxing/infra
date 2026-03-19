@@ -1,22 +1,22 @@
 -- +goose Up
 
 -- Update global events table
-ALTER TABLE sandbox_events_local
+ALTER TABLE sandbox_events_local ON CLUSTER 'cluster'
     ADD COLUMN type LowCardinality(String) CODEC (ZSTD(1)) AFTER event_label,
     ADD COLUMN version String DEFAULT 'v1' CODEC (ZSTD(1)) AFTER type;
 
 -- Update local events table
-ALTER TABLE sandbox_events
+ALTER TABLE sandbox_events ON CLUSTER 'cluster'
     ADD COLUMN type LowCardinality(String) CODEC (ZSTD(1)) AFTER event_label,
     ADD COLUMN version String DEFAULT 'v1' CODEC (ZSTD(1)) AFTER type;
 
 -- +goose Down
 -- Remove columns from clustered table
-ALTER TABLE sandbox_events
+ALTER TABLE sandbox_events ON CLUSTER 'cluster'
 DROP COLUMN IF EXISTS version,
 DROP COLUMN IF EXISTS type;
 
 -- Remove columns from local table
-ALTER TABLE sandbox_events_local
+ALTER TABLE sandbox_events_local ON CLUSTER 'cluster'
 DROP COLUMN IF EXISTS version,
 DROP COLUMN IF EXISTS type;

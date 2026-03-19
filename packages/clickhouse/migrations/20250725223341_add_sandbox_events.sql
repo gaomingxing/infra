@@ -1,11 +1,10 @@
 -- +goose Up
 -- +goose StatementBegin
-CREATE TABLE sandbox_events as sandbox_events_local
+CREATE TABLE IF NOT EXISTS sandbox_events ON CLUSTER 'cluster' as sandbox_events_local
     ENGINE = Distributed('cluster', currentDatabase(), 'sandbox_events_local', xxHash64(sandbox_id));
 -- +goose StatementEnd
 
 -- +goose Down
 -- +goose StatementBegin
-DROP TABLE IF EXISTS sandbox_events;
+DROP TABLE IF EXISTS sandbox_events ON CLUSTER 'cluster';
 -- +goose StatementEnd
-

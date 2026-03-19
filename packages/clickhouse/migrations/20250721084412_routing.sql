@@ -1,10 +1,10 @@
 -- +goose Up
 
 -- 1. Drop old sharding table
-DROP TABLE IF EXISTS metrics_gauge;
+DROP TABLE IF EXISTS metrics_gauge ON CLUSTER 'cluster';
 
 -- 2. Create a dummy routing table with Null engine
-CREATE TABLE metrics_gauge (
+CREATE TABLE IF NOT EXISTS metrics_gauge ON CLUSTER 'cluster' (
    ResourceAttributes    Map(LowCardinality(String), String) CODEC (ZSTD(1)),
    ResourceSchemaUrl     String CODEC (ZSTD(1)),
    ScopeName             String CODEC (ZSTD(1)),
@@ -31,19 +31,19 @@ CREATE TABLE metrics_gauge (
 ) ENGINE = Null;
 
 -- 3. Drop the old source table
-DROP TABLE IF EXISTS metrics_gauge_local;
+DROP TABLE IF EXISTS metrics_gauge_local ON CLUSTER 'cluster';
 
 -- +goose Down
 
 -- 1. Drop the Null-engine routing table
-DROP TABLE IF EXISTS metrics_gauge;
+DROP TABLE IF EXISTS metrics_gauge ON CLUSTER 'cluster';
 
 -- 2. Recreate the original sharding table
-CREATE TABLE metrics_gauge as metrics_gauge_local
+CREATE TABLE IF NOT EXISTS metrics_gauge ON CLUSTER 'cluster' as metrics_gauge_local
     ENGINE = Distributed('cluster', currentDatabase(), 'metrics_gauge_local', xxHash64(Attributes));
 
 -- 3. Recreate the original source table
-CREATE TABLE metrics_gauge_local(
+CREATE TABLE IF NOT EXISTS metrics_gauge_local ON CLUSTER 'cluster' (
     ResourceAttributes    Map(LowCardinality(String), String) CODEC (ZSTD(1)),
     ResourceSchemaUrl     String CODEC (ZSTD(1)),
     ScopeName             String CODEC (ZSTD(1)),

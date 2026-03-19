@@ -1,6 +1,6 @@
 -- +goose Up
 
-CREATE TABLE IF NOT EXISTS "metrics_sum" (
+CREATE TABLE IF NOT EXISTS "metrics_sum" ON CLUSTER 'cluster' (
     ResourceAttributes Map(LowCardinality(String), String) CODEC(ZSTD(1)),
     ResourceSchemaUrl String CODEC(ZSTD(1)),
     ScopeName String CODEC(ZSTD(1)),
@@ -29,7 +29,7 @@ CREATE TABLE IF NOT EXISTS "metrics_sum" (
 ) ENGINE = Null;
 
 
-CREATE TABLE team_metrics_sum_local (
+CREATE TABLE IF NOT EXISTS team_metrics_sum_local ON CLUSTER 'cluster' (
   timestamp     DateTime64(9) CODEC (ZSTD(1)),
   team_id       String        CODEC (ZSTD(1)),
   metric_name   LowCardinality(String) CODEC (ZSTD(1)),
@@ -39,7 +39,7 @@ PARTITION BY toDate(timestamp)
 ORDER BY (team_id, metric_name, toUnixTimestamp64Nano(timestamp))
 TTL toDateTime(timestamp) + INTERVAL 30 DAY;
 
-CREATE TABLE team_metrics_sum AS team_metrics_sum_local
+CREATE TABLE IF NOT EXISTS team_metrics_sum ON CLUSTER 'cluster' AS team_metrics_sum_local
     ENGINE = Distributed('cluster', currentDatabase(), 'team_metrics_sum_local', xxHash64(team_id));
 
 
@@ -53,7 +53,7 @@ FROM metrics_sum
 WHERE MetricName LIKE 'e2b.team.%';
 
 -- +goose Down
-DROP TABLE IF EXISTS "metrics_sum";
-DROP TABLE IF EXISTS team_metrics_sum;
-DROP TABLE IF EXISTS team_metrics_sum_local;
-DROP TABLE IF EXISTS team_metrics_sum_mv;
+DROP TABLE IF EXISTS "metrics_sum" ON CLUSTER 'cluster';
+DROP TABLE IF EXISTS team_metrics_sum ON CLUSTER 'cluster';
+DROP TABLE IF EXISTS team_metrics_sum_local ON CLUSTER 'cluster';
+DROP TABLE IF EXISTS team_metrics_sum_mv ON CLUSTER 'cluster';

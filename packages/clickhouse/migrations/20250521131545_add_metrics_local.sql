@@ -1,6 +1,6 @@
 -- +goose Up
 -- +goose StatementBegin
-CREATE TABLE metrics_gauge_local(
+CREATE TABLE IF NOT EXISTS metrics_gauge_local ON CLUSTER 'cluster' (
     ResourceAttributes    Map(LowCardinality(String), String) CODEC (ZSTD(1)),
     ResourceSchemaUrl     String CODEC (ZSTD(1)),
     ScopeName             String CODEC (ZSTD(1)),
@@ -39,6 +39,5 @@ CREATE TABLE metrics_gauge_local(
 
 -- +goose Down
 -- +goose StatementBegin
-DROP TABLE IF EXISTS metrics_gauge_local;
+DROP TABLE IF EXISTS metrics_gauge_local ON CLUSTER 'cluster';
 -- +goose StatementEnd
-

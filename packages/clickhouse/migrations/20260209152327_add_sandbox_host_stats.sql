@@ -1,6 +1,6 @@
 -- +goose Up
 -- +goose StatementBegin
-CREATE TABLE sandbox_host_stats_local (
+CREATE TABLE IF NOT EXISTS sandbox_host_stats_local ON CLUSTER 'cluster' (
     timestamp DateTime64(9) CODEC (Delta, ZSTD(1)),
     sandbox_id String CODEC (ZSTD(1)),
     sandbox_execution_id String CODEC (ZSTD(1)),
@@ -20,15 +20,15 @@ TTL toDateTime(timestamp) + INTERVAL 7 DAY;
 -- +goose StatementEnd
 
 -- +goose StatementBegin
-CREATE TABLE sandbox_host_stats AS sandbox_host_stats_local
+CREATE TABLE IF NOT EXISTS sandbox_host_stats ON CLUSTER 'cluster' AS sandbox_host_stats_local
     ENGINE = Distributed('cluster', currentDatabase(), 'sandbox_host_stats_local', xxHash64(sandbox_id));
 -- +goose StatementEnd
 
 -- +goose Down
 -- +goose StatementBegin
-DROP TABLE IF EXISTS sandbox_host_stats;
+DROP TABLE IF EXISTS sandbox_host_stats ON CLUSTER 'cluster';
 -- +goose StatementEnd
 
 -- +goose StatementBegin
-DROP TABLE IF EXISTS sandbox_host_stats_local;
+DROP TABLE IF EXISTS sandbox_host_stats_local ON CLUSTER 'cluster';
 -- +goose StatementEnd

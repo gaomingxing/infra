@@ -1,7 +1,7 @@
 -- +goose Up
 
 -- Create target table
-CREATE TABLE sandbox_metrics_gauge_local (
+CREATE TABLE IF NOT EXISTS sandbox_metrics_gauge_local ON CLUSTER 'cluster' (
    timestamp     DateTime64(9) CODEC (ZSTD(1)),
    sandbox_id    String        CODEC (ZSTD(1)),
    team_id       String        CODEC (ZSTD(1)),
@@ -13,7 +13,7 @@ ORDER BY (sandbox_id, metric_name, toUnixTimestamp64Nano(timestamp))
 TTL toDateTime(timestamp) + INTERVAL 7 DAY;
 
 -- Create routing table that routes sandbox metrics
-CREATE TABLE sandbox_metrics_gauge AS sandbox_metrics_gauge_local
+CREATE TABLE IF NOT EXISTS sandbox_metrics_gauge ON CLUSTER 'cluster' AS sandbox_metrics_gauge_local
     ENGINE = Distributed('cluster', currentDatabase(), 'sandbox_metrics_gauge_local', xxHash64(sandbox_id));
 
 -- Create materialized view that routes sandbox metrics
@@ -37,6 +37,6 @@ INSERT INTO sandbox_metrics_gauge SELECT
 FROM metrics_gauge_local WHERE Attributes['sandbox_id'] IS NOT NULL;
 
 -- +goose Down
-DROP TABLE IF EXISTS sandbox_metrics_gauge_mv;
-DROP TABLE IF EXISTS sandbox_metrics_gauge;
-DROP TABLE IF EXISTS sandbox_metrics_gauge_local;
+DROP TABLE IF EXISTS sandbox_metrics_gauge_mv ON CLUSTER 'cluster';
+DROP TABLE IF EXISTS sandbox_metrics_gauge ON CLUSTER 'cluster';
+DROP TABLE IF EXISTS sandbox_metrics_gauge_local ON CLUSTER 'cluster';
