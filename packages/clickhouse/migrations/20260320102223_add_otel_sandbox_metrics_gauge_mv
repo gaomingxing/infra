@@ -1,11 +1,22 @@
 -- otel需要先创建 otel_metrics_gauge otel_metrics_sum 才能运行下面的表
 -- +goose Up
 -- Only create otel materialized view if otel_metrics_gauge table exists
+-- CREATE MATERIALIZED VIEW IF NOT EXISTS otel_sandbox_metrics_gauge_mv TO sandbox_metrics_gauge AS
+-- SELECT
+--     toDateTime64 (TimeUnix, 9) AS timestamp,
+--     mapGet (Attributes, 'sandbox_id') AS sandbox_id,
+--     mapGet (Attributes, 'team_id') AS team_id,
+--     MetricName AS metric_name,
+--     Value AS value
+-- FROM
+--     otel_metrics_gauge
+-- WHERE
+--     MetricName LIKE 'e2b.sandbox.%';
 CREATE MATERIALIZED VIEW IF NOT EXISTS otel_sandbox_metrics_gauge_mv TO sandbox_metrics_gauge AS
 SELECT
-    toDateTime64 (TimeUnix, 9) AS timestamp,
-    mapGet (Attributes, 'sandbox_id') AS sandbox_id,
-    mapGet (Attributes, 'team_id') AS team_id,
+    toDateTime64(TimeUnix, 9) AS timestamp,
+    Attributes['sandbox_id'] AS sandbox_id,
+    Attributes['team_id'] AS team_id,
     MetricName AS metric_name,
     Value AS value
 FROM
@@ -13,11 +24,22 @@ FROM
 WHERE
     MetricName LIKE 'e2b.sandbox.%';
 
+
 -- Only create otel materialized view if otel_metrics_gauge table exists
+-- CREATE MATERIALIZED VIEW IF NOT EXISTS otel_team_metrics_gauge_mv TO team_metrics_gauge AS
+-- SELECT
+--     toDateTime64 (TimeUnix, 9) AS timestamp,
+--     mapGet (Attributes, 'team_id') AS team_id,
+--     MetricName AS metric_name,
+--     Value AS value
+-- FROM
+--     otel_metrics_gauge
+-- WHERE
+--     MetricName LIKE 'e2b.team.%';
 CREATE MATERIALIZED VIEW IF NOT EXISTS otel_team_metrics_gauge_mv TO team_metrics_gauge AS
 SELECT
-    toDateTime64 (TimeUnix, 9) AS timestamp,
-    mapGet (Attributes, 'team_id') AS team_id,
+    toDateTime64(TimeUnix, 9) AS timestamp,
+    Attributes['team_id'] AS team_id,
     MetricName AS metric_name,
     Value AS value
 FROM
@@ -25,11 +47,22 @@ FROM
 WHERE
     MetricName LIKE 'e2b.team.%';
 
+
 -- Only create otel materialized view if otel_metrics_sum table exists
+-- CREATE MATERIALIZED VIEW IF NOT EXISTS otel_team_metrics_sum_mv TO team_metrics_sum AS
+-- SELECT
+--     toDateTime64 (TimeUnix, 9) AS timestamp,
+--     mapGet (Attributes, 'team_id') AS team_id,
+--     MetricName AS metric_name,
+--     Value AS value
+-- FROM
+--     otel_metrics_sum
+-- WHERE
+--     MetricName LIKE 'e2b.team.%';
 CREATE MATERIALIZED VIEW IF NOT EXISTS otel_team_metrics_sum_mv TO team_metrics_sum AS
 SELECT
-    toDateTime64 (TimeUnix, 9) AS timestamp,
-    mapGet (Attributes, 'team_id') AS team_id,
+    toDateTime64(TimeUnix, 9) AS timestamp,
+    Attributes['team_id'] AS team_id,
     MetricName AS metric_name,
     Value AS value
 FROM
