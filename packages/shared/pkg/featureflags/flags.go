@@ -195,7 +195,7 @@ func NewIntFlag(name string, fallback int) IntFlag {
 }
 
 var (
-	MaxSandboxesPerNode           = NewIntFlag("max-sandboxes-per-node", 200)
+	MaxSandboxesPerNode           = NewIntFlag("max-sandboxes-per-node", 400)
 	GcloudConcurrentUploadLimit   = NewIntFlag("gcloud-concurrent-upload-limit", 8)
 	GcloudMaxTasks                = NewIntFlag("gcloud-max-tasks", 16)
 	ClickhouseBatcherMaxBatchSize = NewIntFlag("clickhouse-batcher-max-batch-size", 100)
@@ -204,7 +204,7 @@ var (
 	BestOfKSampleSize             = NewIntFlag("best-of-k-sample-size", 3)                   // Default K=3
 	BestOfKMaxOvercommit          = NewIntFlag("best-of-k-max-overcommit", 400)              // Default R=4 (stored as percentage, max over-commit ratio)
 	BestOfKAlpha                  = NewIntFlag("best-of-k-alpha", 50)                        // Default Alpha=0.5 (stored as percentage for int flag, current usage weight)
-	EnvdInitTimeoutMilliseconds   = NewIntFlag("envd-init-request-timeout-milliseconds", 50) // Timeout for envd init request in milliseconds
+	EnvdInitTimeoutMilliseconds   = NewIntFlag("envd-init-request-timeout-milliseconds", 50000) // Timeout for envd init request in milliseconds
 	HostStatsSamplingInterval     = NewIntFlag("host-stats-sampling-interval", 5000)         // Host stats sampling interval in milliseconds (default 5s)
 	MaxCacheWriterConcurrencyFlag = NewIntFlag("max-cache-writer-concurrency", 10)
 
@@ -233,7 +233,7 @@ var (
 	SandboxMaxIncomingConnections = NewIntFlag("sandbox-max-incoming-connections", -1)
 
 	// BuildBaseRootfsSizeLimitMB is the maximum size of the base rootfs filesystem created from the OCI image, in MB.
-	BuildBaseRootfsSizeLimitMB = NewIntFlag("build-base-rootfs-size-limit-mb", 25000)
+	BuildBaseRootfsSizeLimitMB = NewIntFlag("build-base-rootfs-size-limit-mb", 50000)
 
 	// MinAutoResumeTimeoutSeconds is the minimum auto-resume timeout in seconds.
 	// This prevents thrashing from very short timeouts.

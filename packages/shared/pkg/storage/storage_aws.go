@@ -21,9 +21,9 @@ import (
 )
 
 const (
-	awsOperationTimeout = 5 * time.Second
-	awsWriteTimeout     = 30 * time.Second
-	awsReadTimeout      = 15 * time.Second
+	awsOperationTimeout = 5 * time.Minute
+	awsWriteTimeout     = 30 * time.Minute
+	awsReadTimeout      = 15 * time.Minute
 )
 
 type awsStorage struct {
@@ -51,7 +51,9 @@ func newAWSStorage(ctx context.Context, bucketName string) (*awsStorage, error) 
 		return nil, err
 	}
 
-	client := s3.NewFromConfig(cfg)
+	client := s3.NewFromConfig(cfg, func(o *s3.Options) {
+        o.UsePathStyle = true
+    })
 	presignClient := s3.NewPresignClient(client)
 
 	return &awsStorage{
